@@ -5,9 +5,3 @@ Since I have to still convince the other two i'll list some perks of food segmen
 
 ## Satelite Segmentation
 
-## Food Segmentation
-
-### Datasets
-- [Food Recognition Challenge](https://github.com/lucamarini22/food-recognition-challenge).
-  - train class: 24119 RGB images
-  - validation class: 1269 RGB images   
