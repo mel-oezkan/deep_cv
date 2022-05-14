@@ -40,7 +40,7 @@ def wkt_string_to_polygon(polygon_string: str) -> Polygon:
     return polygon
 
 
-def create_mask(polygons: list, shape=(900, 900), edges=False, edge_thickness=1):
+def create_mask(polygons: list, shape=(900, 900), edges=False, edge_thickness=1) -> np.ndarray:
     """Create mask from list of polygons.
     
     :param polygons: list of polygons belonging to one tile
@@ -69,7 +69,7 @@ def create_mask(polygons: list, shape=(900, 900), edges=False, edge_thickness=1)
 
 
 def mask_from_id(image_id: str, summary: pd.DataFrame,
-                 shape=(900, 900), edges=True, edge_thickness=5):
+                 shape=(900, 900), edges=True, edge_thickness=5) -> np.ndarray:
     """Create the mask correcponding to the ImageId
     
     :param image_id: the id of the image to be masked
