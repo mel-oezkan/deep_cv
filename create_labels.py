@@ -1,11 +1,8 @@
-from tokenize import String
-from venv import create
-import pandas as pd
-from shapely.geometry import Polygon
-import rasterio.features
 import numpy as np
+import pandas as pd
+import rasterio.features
 import scipy.ndimage.morphology as morph
-import matplotlib.pyplot as plt
+from shapely.geometry import Polygon
 
 
 def load_summary(path='./datasets/train/AOI_11_Rotterdam/SummaryData/SN6_Train_AOI_11_Rotterdam_Buildings.csv') -> pd.DataFrame:
