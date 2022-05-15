@@ -3,6 +3,8 @@ import tensorflow as tf
 import skimage
 import create_labels
 import random
+import pandas as pd
+import numpy as np
 
 
 class DatasetGenerator:
@@ -10,10 +12,17 @@ class DatasetGenerator:
     summaray DataFrame to generate the input image and correspinding output
     mask.
     
-    ::
+    :param tile_ids: List of tile identifiers
+    :type tile_ids: list
+    :param summary: Summary dataframe containing all the polygons for each tile
+    :type summary: pd.DataFrame
+    :param tile_dir_path: Path that leads to the images. Should include the
+        beginning of the filename as only tile_id's and '.tif' will be added
+        to this string.
+    :type tile_dir_path: string
     """
 
-    def __init__(self, tile_ids, summary, tile_dir_path):
+    def __init__(self, tile_ids: list, summary: pd.DataFrame, tile_dir_path: str):
         """Constructor method"""
         self.tile_ids = tile_ids
         self.summary = summary
@@ -43,6 +52,9 @@ class DatasetGenerator:
         image = skimage.io.imread(filename)
         image = tf.image.convert_image_dtype(image, tf.float32)
         image = tf.image.resize(image, [256, 256])
+        # resize label
+        label = np.expand_dims(label, axis=2)
+        label = tf.image.resize(label, [68, 68])
         return image, label
 
     def __call__(self) -> tuple:
