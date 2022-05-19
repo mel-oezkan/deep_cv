@@ -17,9 +17,6 @@
 ###############################################################################
 
 
-
-
-
 from typing import Optional, Union, Callable, List
 
 import numpy as np
@@ -37,17 +34,18 @@ class ConvBlock(layers.Layer):
 
     def __init__(self, layer_idx, filters_root, kernel_size, dropout_rate, padding, activation, **kwargs):
         super(ConvBlock, self).__init__(**kwargs)
-        self.layer_idx=layer_idx
-        self.filters_root=filters_root
-        self.kernel_size=kernel_size
-        self.dropout_rate=dropout_rate
-        self.padding=padding
-        self.activation=activation
+        self.layer_idx = layer_idx
+        self.filters_root = filters_root
+        self.kernel_size = kernel_size
+        self.dropout_rate = dropout_rate
+        self.padding = padding
+        self.activation = activation
 
         filters = _get_filter_count(layer_idx, filters_root)
         self.conv2d_1 = layers.Conv2D(filters=filters,
                                       kernel_size=(kernel_size, kernel_size),
-                                      kernel_initializer=_get_kernel_initializer(filters, kernel_size),
+                                      kernel_initializer=_get_kernel_initializer(
+                                          filters, kernel_size),
                                       strides=1,
                                       padding=padding)
         self.dropout_1 = layers.Dropout(rate=dropout_rate)
@@ -55,7 +53,8 @@ class ConvBlock(layers.Layer):
 
         self.conv2d_2 = layers.Conv2D(filters=filters,
                                       kernel_size=(kernel_size, kernel_size),
-                                      kernel_initializer=_get_kernel_initializer(filters, kernel_size),
+                                      kernel_initializer=_get_kernel_initializer(
+                                          filters, kernel_size),
                                       strides=1,
                                       padding=padding)
         self.dropout_2 = layers.Dropout(rate=dropout_rate)
@@ -91,17 +90,19 @@ class UpconvBlock(layers.Layer):
 
     def __init__(self, layer_idx, filters_root, kernel_size, pool_size, padding, activation, **kwargs):
         super(UpconvBlock, self).__init__(**kwargs)
-        self.layer_idx=layer_idx
-        self.filters_root=filters_root
-        self.kernel_size=kernel_size
-        self.pool_size=pool_size
-        self.padding=padding
-        self.activation=activation
+        self.layer_idx = layer_idx
+        self.filters_root = filters_root
+        self.kernel_size = kernel_size
+        self.pool_size = pool_size
+        self.padding = padding
+        self.activation = activation
 
         filters = _get_filter_count(layer_idx + 1, filters_root)
         self.upconv = layers.Conv2DTranspose(filters // 2,
-                                             kernel_size=(pool_size, pool_size),
-                                             kernel_initializer=_get_kernel_initializer(filters, kernel_size),
+                                             kernel_size=(
+                                                 pool_size, pool_size),
+                                             kernel_initializer=_get_kernel_initializer(
+                                                 filters, kernel_size),
                                              strides=pool_size, padding=padding)
 
         self.activation_1 = layers.Activation(activation)
@@ -121,6 +122,7 @@ class UpconvBlock(layers.Layer):
                     activation=self.activation,
                     **super(UpconvBlock, self).get_config(),
                     )
+
 
 class CropConcatBlock(layers.Layer):
 
@@ -149,8 +151,8 @@ def build_model(nx: Optional[int] = None,
                 kernel_size: int = 3,
                 pool_size: int = 2,
                 dropout_rate: int = 0.5,
-                padding:str="valid",
-                activation:Union[str, Callable]="relu") -> Model:
+                padding: str = "valid",
+                activation: Union[str, Callable] = "relu") -> Model:
     """
     Constructs a U-Net model
     :param nx: (Optional) image size on x-axis
@@ -186,18 +188,20 @@ def build_model(nx: Optional[int] = None,
     x = ConvBlock(layer_idx + 1, **conv_params)(x)
 
     for layer_idx in range(layer_idx, -1, -1):
-        x = UpconvBlock(layer_idx,
-                        filters_root,
-                        kernel_size,
-                        pool_size,
-                        padding,
-                        activation)(x)
+        x = UpconvBlock(
+            layer_idx,
+            filters_root,
+            kernel_size,
+            pool_size,
+            padding,
+            activation)(x)
         x = CropConcatBlock()(x, contracting_layers[layer_idx])
         x = ConvBlock(layer_idx, **conv_params)(x)
 
     x = layers.Conv2D(filters=num_classes,
                       kernel_size=(1, 1),
-                      kernel_initializer=_get_kernel_initializer(filters_root, kernel_size),
+                      kernel_initializer=_get_kernel_initializer(
+                          filters_root, kernel_size),
                       strides=1,
                       padding=padding)(x)
 
@@ -217,14 +221,16 @@ def _get_kernel_initializer(filters, kernel_size):
     return TruncatedNormal(stddev=stddev)
 
 
-def finalize_model(model: Model,
-                   loss: Optional[Union[Callable, str]]=losses.categorical_crossentropy,
-                   optimizer: Optional= None,
-                   metrics:Optional[List[Union[Callable,str]]]=None,
-                   dice_coefficient: bool=True,
-                   auc: bool=True,
-                   mean_iou: bool=True,
-                   **opt_kwargs):
+def finalize_model(
+    model: Model,
+    loss: Optional[Union[Callable, str]] = losses.categorical_crossentropy,
+    optimizer: Optional = None,
+    metrics: Optional[List[Union[Callable, str]]] = None,
+    dice_coefficient: bool = True,
+    auc: bool = True,
+    mean_iou: bool = True,
+    **opt_kwargs
+):
     """
     Configures the model for training by setting, loss, optimzer, and tracked metrics
     :param model: the model to compile
