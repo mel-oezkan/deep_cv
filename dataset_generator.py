@@ -50,10 +50,10 @@ class DatasetGenerator:
         filename = self.tile_dir_path + tile_id + '.tif'
         image = skimage.io.imread(filename)
         image = tf.image.convert_image_dtype(image, tf.float32)
-        image = tf.image.resize(image, [128, 128])
+        image = tf.image.resize(image, [256, 256])
         # resize label
         label = np.expand_dims(label, axis=2)
-        label = tf.image.resize(label, [128, 128])
+        label = tf.image.resize(label, [256, 256])
         return image, label
 
     def __call__(self) -> tuple:

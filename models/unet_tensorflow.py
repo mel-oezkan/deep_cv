@@ -3,7 +3,7 @@ from tensorflow_examples.models.pix2pix import pix2pix
 import tensorflow_datasets as tfds
 
 
-base_model = tf.keras.applications.MobileNetV2(input_shape=[128, 128, 3], include_top=False)
+base_model = tf.keras.applications.MobileNetV2(input_shape=[256, 256, 3], include_top=False)
 
 # Use the activations of these layers
 layer_names = [
@@ -28,7 +28,7 @@ up_stack = [
 ]
 
 def unet_model(output_channels:int):
-    inputs = tf.keras.layers.Input(shape=[128, 128, 3])
+    inputs = tf.keras.layers.Input(shape=[256, 256, 3])
 
     # Downsampling through the model
     skips = down_stack(inputs)
