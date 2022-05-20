@@ -1,12 +1,17 @@
+from gc import callbacks
 from random import shuffle
-from imageio import save
 import tensorflow as tf
 from create_labels import *
 import getopt
 import sys
+import matplotlib.pyplot as plt
+import random
+from IPython.display import clear_output
+
 
 from dataset_generator import DatasetGenerator
 from models.test_net import build_model, finalize_model
+from models.unet_tensorflow import model
 
 
 img_types = ['PAN', 'PS-RGB', 'PS-RGBNIR', 'RGBNIR', 'SAR-Intensity']
@@ -35,18 +40,20 @@ def create_dataset(image_type: str=IMG_TYPE, max_images=None) -> tf.data.Dataset
     # load summary-document containing WKT-Polygon strings and image id's
     summary = load_summary()
     # list all image_ids that the generator should use
-    img_ids = list(set(summary['ImageId']))
-    img_ids = shuffle(img_ids)
+    img_ids = np.array(list(set(summary['ImageId'])))
+    # shuffle
+    reidx = random.sample(population = list(range(img_ids.shape[0])),
+                              k = img_ids.shape[0])
+    img_ids = img_ids[reidx]
     # limit length of img_ids to max_images
-    if max_images and max_images < len(img_ids):
+    if max_images and max_images < img_ids.shape[0]:
         img_ids = img_ids[:max_images]
-    
     # create DatasetGenerator-object
     dg = DatasetGenerator(img_ids, summary, img_path_prototype)
     
     # create dataset from generator
     shape_in = (tf.float32, tf.int64)
-    shape_out = (tf.TensorShape([256, 256, 3]), tf.TensorShape([68, 68, 1]))
+    shape_out = (tf.TensorShape([128, 128, 3]), tf.TensorShape([128, 128, 1]))
     dataset = tf.data.Dataset.from_generator(dg, shape_in, shape_out)
     return dataset
 
@@ -93,8 +100,8 @@ def dataset_pipeline(dataset: tf.data.Dataset, batch_size: int=BATCH_SIZE,
 
 
 def train(model, train_dataset: tf.data.Dataset,
-          val_dataset: tf.data.Dataset=None, epochs: int=EPOCHS,
-          save_model=True, model_name: str=MODEL_NAME):
+          val_dataset: tf.data.Dataset=None,
+          epochs: int=EPOCHS, save_model=True):
     """Trains generic UNet Model.
     
     :param model: model to be trained
@@ -109,17 +116,47 @@ def train(model, train_dataset: tf.data.Dataset,
     :param save_model: if true model will be saved when training is done,
         defaults to true
     :type save_model: boolean, optional
-    :param model_name: name the saved model will be given, defaults to
-        file hyperparameter
-    :type model_name: 
     """ 
     # fit model to data
-    model.fit(train_dataset, validation_data=val_dataset, epochs=epochs)
+    model.fit(train_dataset, validation_data=val_dataset, epochs=epochs, callbacks=[DisplayCallback()])
     if save_model:
-        unet.save(f'model/{model_name}')
+        model.save(f'model/{model.name}')
+
+
+class DisplayCallback(tf.keras.callbacks.Callback):
+  def on_epoch_end(self, epoch, logs=None):
+    clear_output(wait=True)
+    show_predictions()
+    print ('\nSample Prediction after epoch {}\n'.format(epoch+1))
+
+
+
+def display(display_list):
+    plt.figure(figsize=(5, 5))
+    
+    title = ['Input Image', 'True Mask', 'Predicted Mask']
+
+    for i in range(len(display_list)):
+        plt.subplot(1, len(display_list), i+1)
+        plt.title(title[i])
+        plt.imshow(tf.keras.utils.array_to_img(display_list[i]))
+        plt.axis('off')
+    plt.show()
+
+
+def show_predictions(num=1):
+    if dataset:
+        for image, mask in dataset.take(num):
+            pred_mask = model.predict(image)
+            display([image[0], mask[0], pred_mask[0]])
+
+
 
 if __name__ == '__main__':
     #args = sys.argv[1:]
     #options, args = getopt.getopt(args, shortopts='t:', longopts=['type='])
-    unet = build_model(nx=256, ny=256, channels=3, num_classes=1, layer_depth=5)
-    finalize_model(unet)
+    #unet.name = MODEL_NAME
+    dataset = create_dataset(max_images=200)
+    dataset = dataset_pipeline(dataset)
+    show_predictions()
+    train(model, train_dataset=dataset)

@@ -1,4 +1,3 @@
-from numpy import tile
 import tensorflow as tf
 import skimage
 import create_labels
@@ -24,7 +23,7 @@ class DatasetGenerator:
 
     def __init__(self, tile_ids: list, summary: pd.DataFrame, tile_dir_path: str):
         """Constructor method"""
-        self.tile_ids = tile_ids
+        self.tile_ids = np.array(tile_ids)
         self.summary = summary
         self.tile_dir_path = tile_dir_path
     
@@ -34,7 +33,7 @@ class DatasetGenerator:
         :return: length of self.path_array
         :rtype: integer
         """
-        return len(self.tile_ids)
+        return self.tile_ids.shape[0]
 
     def __getitem__(self, idx: int) -> tuple:
         """Generate one item from self.path_array
@@ -46,15 +45,15 @@ class DatasetGenerator:
         # get tile identifier
         tile_id = self.tile_ids[idx]
         # create footprint mask
-        label = create_labels.mask_from_id(tile_id, self.summary)
+        label = create_labels.mask_from_id(tile_id, self.summary, edges=False)
         # load and resize image
         filename = self.tile_dir_path + tile_id + '.tif'
         image = skimage.io.imread(filename)
         image = tf.image.convert_image_dtype(image, tf.float32)
-        image = tf.image.resize(image, [256, 256])
+        image = tf.image.resize(image, [128, 128])
         # resize label
         label = np.expand_dims(label, axis=2)
-        label = tf.image.resize(label, [68, 68])
+        label = tf.image.resize(label, [128, 128])
         return image, label
 
     def __call__(self) -> tuple:

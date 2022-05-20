@@ -56,6 +56,7 @@ def create_mask(polygons: list, shape=(900, 900), edges=False, edge_thickness=1)
     :rtype: numpy.ndarray
     """
     mask = rasterio.features.rasterize(polygons, out_shape=shape)
+    mask[mask==1] = 1
     if edges:
         eroded_img = mask
         # itertively erode the house footprint
