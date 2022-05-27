@@ -1,11 +1,10 @@
 import tensorflow as tf
-from src.models.Losses import HybridLoss
-from src.models.metrics import dice_coefficient
+from src.Losses import HybridLoss
 from tensorflow_examples.models.pix2pix import pix2pix
-import tensorflow_datasets as tfds
 
 
-base_model = tf.keras.applications.MobileNetV2(input_shape=[256, 256, 3], include_top=False)
+base_model = tf.keras.applications.MobileNetV2(
+    input_shape=[256, 256, 3], include_top=False)
 
 # Use the activations of these layers
 layer_names = [
@@ -15,10 +14,12 @@ layer_names = [
     'block_13_expand_relu',  # 16x16
     'block_16_project',      # 8x8
 ]
-base_model_outputs = [base_model.get_layer(name).output for name in layer_names]
+base_model_outputs = [base_model.get_layer(
+    name).output for name in layer_names]
 
 # Create the feature extraction model
-down_stack = tf.keras.Model(inputs=base_model.input, outputs=base_model_outputs)
+down_stack = tf.keras.Model(inputs=base_model.input,
+                            outputs=base_model_outputs)
 
 down_stack.trainable = False
 
@@ -29,7 +30,8 @@ up_stack = [
     pix2pix.upsample(64, 3),   # 64x64 -> 128x128
 ]
 
-def unet_model(output_channels:int):
+
+def unet_model(output_channels: int):
     inputs = tf.keras.layers.Input(shape=[256, 256, 3])
 
     # Downsampling through the model
@@ -52,6 +54,7 @@ def unet_model(output_channels:int):
 
     return tf.keras.Model(inputs=inputs, outputs=x)
 
+
 OUTPUT_CLASSES = 1
 
 
@@ -61,5 +64,3 @@ model.compile(
     optimizer='adam',
     loss=loss_fnc,
     metrics=['accuracy'])
-
-

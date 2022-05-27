@@ -23,9 +23,9 @@ EPOCHS = 2
 MODEL_NAME = 'standart model'
 
 
-def create_dataset(image_type: str=IMG_TYPE, max_images=None) -> tf.data.Dataset:
+def create_dataset(image_type: str = IMG_TYPE, max_images=None) -> tf.data.Dataset:
     """Create a dataset.
-    
+
     :param image_type: type of image that should be read, defaults to
         file hyperparameter
     :type image_type: string, optional
@@ -42,15 +42,15 @@ def create_dataset(image_type: str=IMG_TYPE, max_images=None) -> tf.data.Dataset
     # list all image_ids that the generator should use
     img_ids = np.array(list(set(summary['ImageId'])))
     # shuffle
-    reidx = random.sample(population = list(range(img_ids.shape[0])),
-                              k = img_ids.shape[0])
+    reidx = random.sample(population=list(range(img_ids.shape[0])),
+                          k=img_ids.shape[0])
     img_ids = img_ids[reidx]
     # limit length of img_ids to max_images
     if max_images and max_images < img_ids.shape[0]:
         img_ids = img_ids[:max_images]
     # create DatasetGenerator-object
     dg = DatasetGenerator(img_ids, summary, img_path_prototype)
-    
+
     # create dataset from generator
     shape_in = (tf.float32, tf.int64)
     shape_out = (tf.TensorShape([128, 128, 3]), tf.TensorShape([128, 128, 1]))
@@ -58,11 +58,11 @@ def create_dataset(image_type: str=IMG_TYPE, max_images=None) -> tf.data.Dataset
     return dataset
 
 
-def dataset_pipeline(dataset: tf.data.Dataset, batch_size: int=BATCH_SIZE,
-                     prefetch_size: int=PREFETCH_SIZE, functions: list=None,
-                     args: list=None) -> tf.data.Dataset:
+def dataset_pipeline(dataset: tf.data.Dataset, batch_size: int = BATCH_SIZE,
+                     prefetch_size: int = PREFETCH_SIZE, functions: list = None,
+                     args: list = None) -> tf.data.Dataset:
     """Preprocess dataset.
-    
+
     :param dataset: dataset to be preprocessed
     :type dataset: tf.data.Dataset
     :param batch_size: batch size of the resulting data, defaults to
@@ -100,10 +100,10 @@ def dataset_pipeline(dataset: tf.data.Dataset, batch_size: int=BATCH_SIZE,
 
 
 def train(model, train_dataset: tf.data.Dataset,
-          val_dataset: tf.data.Dataset=None,
-          epochs: int=EPOCHS, save_model=True):
+          val_dataset: tf.data.Dataset = None,
+          epochs: int = EPOCHS, save_model=True):
     """Trains generic UNet Model.
-    
+
     :param model: model to be trained
     :type model: tf.Model
     :param train_dataset: dataset model should be trained on
@@ -116,24 +116,24 @@ def train(model, train_dataset: tf.data.Dataset,
     :param save_model: if true model will be saved when training is done,
         defaults to true
     :type save_model: boolean, optional
-    """ 
+    """
     # fit model to data
-    model.fit(train_dataset, validation_data=val_dataset, epochs=epochs, callbacks=[DisplayCallback()])
+    model.fit(train_dataset, validation_data=val_dataset,
+              epochs=epochs, callbacks=[DisplayCallback()])
     if save_model:
         model.save(f'model/{model.name}')
 
 
 class DisplayCallback(tf.keras.callbacks.Callback):
-  def on_epoch_end(self, epoch, logs=None):
-    clear_output(wait=True)
-    show_predictions()
-    print ('\nSample Prediction after epoch {}\n'.format(epoch+1))
-
+    def on_epoch_end(self, epoch, logs=None):
+        clear_output(wait=True)
+        show_predictions()
+        print('\nSample Prediction after epoch {}\n'.format(epoch+1))
 
 
 def display(display_list):
     plt.figure(figsize=(5, 5))
-    
+
     title = ['Input Image', 'True Mask', 'Predicted Mask']
 
     for i in range(len(display_list)):
@@ -149,7 +149,6 @@ def show_predictions(num=1):
         for image, mask in dataset.take(num):
             pred_mask = model.predict(image)
             display([image[0], mask[0], pred_mask[0]])
-
 
 
 if __name__ == '__main__':
