@@ -2,15 +2,14 @@ from gc import callbacks
 from random import shuffle
 import tensorflow as tf
 from create_labels import *
-import getopt
-import sys
 import matplotlib.pyplot as plt
 import random
+import os
 from IPython.display import clear_output
 
 
-from dataset_generator import DatasetGenerator
-from models.test_net import build_model, finalize_model
+from dataset_generator import DatasetGenerator, Generator_resized_data
+#from models.test_net import build_model, finalize_model
 from models.unet_tensorflow import model
 
 
@@ -21,6 +20,13 @@ BATCH_SIZE = 16
 PREFETCH_SIZE = 24
 EPOCHS = 2
 MODEL_NAME = 'standart model'
+
+def create_resized_dataset(image_ids = None):
+
+    return tf.data.Dataset.from_generator(Generator_resized_data(image_ids = image_ids),
+    output_types=(tf.float32,tf.int32),
+    output_shapes= (tf.TensorShape([128, 128, 4]), tf.TensorShape([128, 128, 1]))
+    )
 
 
 def create_dataset(image_type: str=IMG_TYPE, max_images=None) -> tf.data.Dataset:
@@ -156,7 +162,12 @@ if __name__ == '__main__':
     #args = sys.argv[1:]
     #options, args = getopt.getopt(args, shortopts='t:', longopts=['type='])
     #unet.name = MODEL_NAME
-    dataset = create_dataset(max_images=200)
+
+    tf.keras.backend.clear_session()
+
+    print(os.getcwd())
+
+    dataset = create_resized_dataset()
     dataset = dataset_pipeline(dataset)
     show_predictions()
     train(model, train_dataset=dataset)

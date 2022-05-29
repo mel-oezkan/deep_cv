@@ -4,6 +4,8 @@ import create_labels
 import random
 import pandas as pd
 import numpy as np
+import cv2
+import os
 
 
 class DatasetGenerator:
@@ -73,3 +75,36 @@ class DatasetGenerator:
         reidx = random.sample(population = list(range(self.__len__())),
                               k = self.__len__())
         self.tile_ids = self.tile_ids[reidx]
+
+
+
+
+
+class Generator_resized_data():
+
+    def __init__(self,image_ids=None):
+
+        self.image_ids = image_ids
+
+        if self.image_ids is None:
+
+            self.image_ids = np.array([i[:-4] for i in os.listdir("datasets/train/AOI_11_Rotterdam/Labels_128")])
+
+
+    def __call__(self):
+
+        for img_id in self.image_ids:
+
+            sar_path = f"datasets/train/AOI_11_Rotterdam/SAR-Intensity_128/SN6_Train_AOI_11_Rotterdam_SAR-Intensity_{img_id}.tif"
+
+            label_path = f"datasets/train/AOI_11_Rotterdam/Labels_128/{img_id}.tif"
+
+            sar_img = tf.image.convert_image_dtype(cv2.imread(sar_path,cv2.IMREAD_UNCHANGED), tf.float32)/255
+            
+            mask_img = cv2.imread(label_path,cv2.IMREAD_UNCHANGED)
+
+            mask_img = np.expand_dims(mask_img,2)
+
+            mask_img = tf.image.convert_image_dtype(mask_img, tf.int32)/255
+
+            yield sar_img, mask_img
