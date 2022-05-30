@@ -5,7 +5,7 @@ import scipy.ndimage.morphology as morph
 from shapely.geometry import Polygon
 
 
-def load_summary(path='./datasets/train/AOI_11_Rotterdam/SummaryData/SN6_Train_AOI_11_Rotterdam_Buildings.csv') -> pd.DataFrame:
+def load_summary(path='../datasets/train/AOI_11_Rotterdam/SummaryData/SN6_Train_AOI_11_Rotterdam_Buildings.csv') -> pd.DataFrame:
     """Load the summary csv containing polygon information, image_id.
     
     :param path: path to the summary csv documents,
