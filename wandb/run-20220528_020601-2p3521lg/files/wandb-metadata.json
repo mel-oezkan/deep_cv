@@ -1,0 +1,24 @@
+{
+    "os": "Linux-5.13.0-44-generic-x86_64-with-glibc2.17",
+    "python": "3.8.12",
+    "heartbeatAt": "2022-05-28T00:06:35.447693",
+    "startedAt": "2022-05-28T00:06:01.226016",
+    "docker": null,
+    "gpu": "NVIDIA GeForce RTX 2060",
+    "gpu_count": 1,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "main.py",
+    "codePath": "main.py",
+    "git": {
+        "remote": "git@github.com:mel-oezkan/deep_cv.git",
+        "commit": "9325aadea0665a623ca1d1b3ecfc5222b32fde14"
+    },
+    "email": "meloezkan@uni-osnabrueck.de",
+    "root": "/home/melih/Code/uni/sem6/deep_cv",
+    "host": "oezkan",
+    "username": "melih",
+    "executable": "/home/melih/anaconda3/envs/tf-web/bin/python"
+}
