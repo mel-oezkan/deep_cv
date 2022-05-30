@@ -92,9 +92,11 @@ class DatasetGenerator:
 
 
 class Generator_resized_data():
-
+    """Generator to load resized images witout black bars
+    """
     def __init__(self,image_ids=None):
-
+        """
+        image_ids : iterator of string of image_ids you want to train on"""
         self.image_ids = image_ids
 
         if self.image_ids is None:
@@ -103,19 +105,21 @@ class Generator_resized_data():
 
 
     def __call__(self):
-
+        # for all ids
         for img_id in self.image_ids:
 
+            # create paths
             sar_path = f"datasets/train/AOI_11_Rotterdam/SAR-Intensity_128/SN6_Train_AOI_11_Rotterdam_SAR-Intensity_{img_id}.tif"
-
             label_path = f"datasets/train/AOI_11_Rotterdam/Labels_128/{img_id}.tif"
 
+            # load and convert sar image
             sar_img = tf.image.convert_image_dtype(cv2.imread(sar_path,cv2.IMREAD_UNCHANGED), tf.float32)/255
             
+            # load mask image
             mask_img = cv2.imread(label_path,cv2.IMREAD_UNCHANGED)
-
+            # expand last dim
             mask_img = np.expand_dims(mask_img,2)
-
+            # convert
             mask_img = tf.image.convert_image_dtype(mask_img, tf.int32)/255
 
             yield sar_img, mask_img
