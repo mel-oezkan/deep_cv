@@ -88,19 +88,16 @@ class DatasetGenerator:
         self.tile_ids = self.tile_ids[reidx]
 
 
-
-
-
 class Generator_resized_data():
 
-    def __init__(self,image_ids=None):
+    def __init__(self, image_ids=None):
 
         self.image_ids = image_ids
 
         if self.image_ids is None:
 
-            self.image_ids = np.array([i[:-4] for i in os.listdir("datasets/train/AOI_11_Rotterdam/Labels_128")])
-
+            self.image_ids = np.array(
+                [i[:-4] for i in os.listdir("datasets/train/AOI_11_Rotterdam/Labels_128")])
 
     def __call__(self):
 
@@ -110,11 +107,12 @@ class Generator_resized_data():
 
             label_path = f"datasets/train/AOI_11_Rotterdam/Labels_128/{img_id}.tif"
 
-            sar_img = tf.image.convert_image_dtype(cv2.imread(sar_path,cv2.IMREAD_UNCHANGED), tf.float32)/255
-            
-            mask_img = cv2.imread(label_path,cv2.IMREAD_UNCHANGED)
+            sar_img = tf.image.convert_image_dtype(cv2.imread(
+                sar_path, cv2.IMREAD_UNCHANGED), tf.float32)/255
 
-            mask_img = np.expand_dims(mask_img,2)
+            mask_img = cv2.imread(label_path, cv2.IMREAD_UNCHANGED)
+
+            mask_img = np.expand_dims(mask_img, 2)
 
             mask_img = tf.image.convert_image_dtype(mask_img, tf.int32)/255
 
