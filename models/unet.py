@@ -1,4 +1,8 @@
-import numpy as np # for using np arrays
+##
+Source: https://github.com/VidushiBhatia/U-Net-Implementation/blob/main/U_Net_for_Image_Segmentation_From_Scratch_Using_TensorFlow_v4.ipynb
+##
+
+import numpy as np
 
 # for bulding and running deep learning model
 import tensorflow as tf
