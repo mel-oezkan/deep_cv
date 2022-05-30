@@ -10,7 +10,7 @@ class DatasetGenerator:
     """This is a data-generator class. It takes a list of image paths and a
     summaray DataFrame to generate the input image and correspinding output
     mask.
-    
+
     :param tile_ids: List of tile identifiers
     :type tile_ids: list
     :param summary: Summary dataframe containing all the polygons for each tile
@@ -21,15 +21,25 @@ class DatasetGenerator:
     :type tile_dir_path: string
     """
 
-    def __init__(self, tile_ids: list, summary: pd.DataFrame, tile_dir_path: str):
+    def __init__(self,
+                 tile_ids: list,
+                 summary: pd.DataFrame,
+                 tile_dir_path: str,
+                 shuffle=False,
+                 limit=None
+                 ):
         """Constructor method"""
         self.tile_ids = np.array(tile_ids)
         self.summary = summary
         self.tile_dir_path = tile_dir_path
-    
+        self.limit = limit
+
+        if shuffle:
+            np.random.shuffle(self.tile_ids)
+
     def __len__(self) -> int:
         """Return length of dataset/self.path_array
-        
+
         :return: length of self.path_array
         :rtype: integer
         """
@@ -37,7 +47,7 @@ class DatasetGenerator:
 
     def __getitem__(self, idx: int) -> tuple:
         """Generate one item from self.path_array
-        
+
         :param idx: index of path in self.path_array
         :type idx: integer
         :return: image, label pair
@@ -58,11 +68,12 @@ class DatasetGenerator:
 
     def __call__(self) -> tuple:
         """Yield one item from the dataset. Shuffle if end is reached
-        
+
         :yield: one dataset item tuple
         :ytype: tuple
         """
-        for i in range(self.__len__()):
+        im_count = self.limit if self.limit else self.__len__()
+        for i in range(im_count):
             yield self.__getitem__(i)
 
             if i == self.__len__() - 1:
@@ -70,6 +81,6 @@ class DatasetGenerator:
 
     def on_epoch_end(self):
         """Shuffle self.path_array"""
-        reidx = random.sample(population = list(range(self.__len__())),
-                              k = self.__len__())
+        reidx = random.sample(population=list(range(self.__len__())),
+                              k=self.__len__())
         self.tile_ids = self.tile_ids[reidx]

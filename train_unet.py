@@ -10,7 +10,6 @@ from IPython.display import clear_output
 
 
 from dataset_generator import DatasetGenerator
-from models.test_net import build_model, finalize_model
 from models.unet_tensorflow import model
 
 
@@ -123,12 +122,21 @@ def train(model, train_dataset: tf.data.Dataset,
     if save_model:
         model.save(f'model/{model.name}')
 
+    # def show_predictions(self):
+    #     _, ax = plt.subplots(3, self.sample_count)
 
-class DisplayCallback(tf.keras.callbacks.Callback):
-    def on_epoch_end(self, epoch, logs=None):
-        clear_output(wait=True)
-        show_predictions()
-        print('\nSample Prediction after epoch {}\n'.format(epoch+1))
+    #     preds = self.model.predict(self.val_x)
+    #     if len(preds.shape) >= 3 and preds.ndim >= 2:
+    #         for index, sample in enumerate(zip(self.val_x, preds, self.val_y)):
+    #             ax[0, index].imshow(sample[0])
+    #             ax[0, index].axis('off')
+    #             ax[1, index].imshow(sample[1])
+    #             ax[1, index].axis('off')
+    #             ax[2, index].imshow(sample[2])
+    #             ax[2, index].axis('off')
+
+    #             plt.show()
+    #             break
 
 
 def display(display_list):
