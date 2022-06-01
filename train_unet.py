@@ -8,12 +8,8 @@ import os
 from IPython.display import clear_output
 
 
-<<<<<<< HEAD
-from dataset_generator import DatasetGenerator, Generator_resized_data
+from dataset_generator import DatasetGenerator, ResizedDataGenerator
 #from models.test_net import build_model, finalize_model
-=======
-from dataset_generator import DatasetGenerator
->>>>>>> effNet
 from models.unet_tensorflow import model
 
 
@@ -25,15 +21,17 @@ PREFETCH_SIZE = 24
 EPOCHS = 2
 MODEL_NAME = 'standart model'
 
-def create_resized_dataset(image_ids = None):
+
+def create_resized_dataset(image_ids=None):
     """Creates tf.dataset of resized images without black bars
-    
+
     image_ids : iterator of string of image_ids you want to train on
     """
-    return tf.data.Dataset.from_generator(Generator_resized_data(image_ids = image_ids),
-    output_types=(tf.float32,tf.int32),
-    output_shapes= (tf.TensorShape([128, 128, 4]), tf.TensorShape([128, 128, 1]))
-    )
+    return tf.data.Dataset.from_generator(ResizedDataGenerator(image_ids=image_ids),
+                                          output_types=(tf.float32, tf.int32),
+                                          output_shapes=(tf.TensorShape(
+                                              [128, 128, 4]), tf.TensorShape([128, 128, 1]))
+                                          )
 
 
 def create_dataset(image_type: str = IMG_TYPE, max_images=None) -> tf.data.Dataset:
@@ -184,5 +182,6 @@ if __name__ == '__main__':
 
     dataset = create_resized_dataset()
     dataset = dataset_pipeline(dataset)
+
     show_predictions()
     train(model, train_dataset=dataset)

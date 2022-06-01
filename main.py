@@ -1,16 +1,13 @@
+import random
 import wandb
 from wandb.keras import WandbCallback
 
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from create_labels import *
 
-import os
-import random
-
 from dataset_generator import DatasetGenerator
-from models.unet_tensorflow import model
 from src.Callbacks import DisplayTestCallback
+from src.models.basicUnet.__index__ import BasicUnet
 
 
 print('Initalize wandb project')
@@ -25,6 +22,8 @@ wandb.config = {
 
 tf.keras.backend.clear_session()
 
+
+# -------------- Setting up Data Pipeline --------------
 print('Setting up data pipeline')
 AOI_PATH = '/home/melih/Code/uni/sem6/space_net/train/AOI_11_Rotterdam'
 image_type = 'PS-RGB'
@@ -46,12 +45,16 @@ dataset = tf.data.Dataset.from_generator(
     data_gen, out_type, out_shape
 ).batch(wandb.config.get('batch_size'))
 
+# -------------- Creating Test Samples --------------
 
 samples = random.choices(data_gen, k=10)
 samples = list(zip(*samples))
 
 val_imgs = np.asarray(samples[0])
 val_label = np.asarray(samples[1])
+
+# -------------- Setting up Training --------------
+
 
 print('Restric')
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -62,6 +65,12 @@ if gpus:
     except RuntimeError as e:
         print(e)
 
+model = BasicUnet.create_model()
+model.compile(
+    loss=tf.keras.losses.MeanSquareError()
+)
+
+# -------------- Train Model --------------
 
 model_history = model.fit(
     dataset,
@@ -72,6 +81,7 @@ model_history = model.fit(
             data_type='image',
             input_type='image',
             output_type='segmentation_mask',
+            predictions=10,
             training_data=[val_imgs, val_label]
         )
     ]
