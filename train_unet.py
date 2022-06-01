@@ -26,7 +26,10 @@ EPOCHS = 2
 MODEL_NAME = 'standart model'
 
 def create_resized_dataset(image_ids = None):
-
+    """Creates tf.dataset of resized images without black bars
+    
+    image_ids : iterator of string of image_ids you want to train on
+    """
     return tf.data.Dataset.from_generator(Generator_resized_data(image_ids = image_ids),
     output_types=(tf.float32,tf.int32),
     output_shapes= (tf.TensorShape([128, 128, 4]), tf.TensorShape([128, 128, 1]))
