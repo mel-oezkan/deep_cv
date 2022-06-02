@@ -40,7 +40,7 @@ def preprocess_data(data, options=None):
     dataset = dataset.shuffle(10_000)
     dataset = dataset.batch(batch_size)
     dataset = dataset.prefetch(prefetch_size)
-    
+
     pass
 
 
@@ -51,3 +51,4 @@ def small_data(amount) -> tuple:
     """
 
     im_generator = ResizedDataGenerator()
+    
