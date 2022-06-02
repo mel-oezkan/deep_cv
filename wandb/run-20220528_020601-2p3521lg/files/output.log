@@ -1,8 +1,0 @@
-
-Setting up data pipeline
-Traceback (most recent call last):
-  File "main.py", line 39, in <module>
-    data_gen = DatasetGenerator(
-  File "/home/melih/Code/uni/sem6/deep_cv/dataset_generator.py", line 38, in __init__
-    self.tile_ids.shuffle()
-AttributeError: 'numpy.ndarray' object has no attribute 'shuffle'

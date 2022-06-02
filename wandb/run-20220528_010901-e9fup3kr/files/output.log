@@ -1,8 +1,0 @@
-
-Setting up data pipeline
-Restric
-Virtual devices cannot be modified after being initialized
-Traceback (most recent call last):
-  File "main.py", line 62, in <module>
-    DisplayTestCallback(dataset.take(1))]
-TypeError: __init__() missing 2 required positional arguments: 'val_x' and 'val_y'
