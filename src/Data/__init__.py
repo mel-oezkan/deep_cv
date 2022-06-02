@@ -34,8 +34,13 @@ def load_data(data_name: str, amount=None) -> tf.data.Dataset:
     return dataset
 
 
-def preprocess_data(data, options):
+def preprocess_data(data, options=None):
 
+    # shuffle, batch and prefetch the dataset
+    dataset = dataset.shuffle(10_000)
+    dataset = dataset.batch(batch_size)
+    dataset = dataset.prefetch(prefetch_size)
+    
     pass
 
 
