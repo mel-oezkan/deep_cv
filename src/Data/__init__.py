@@ -1,9 +1,19 @@
+from concurrent.futures import process
 import tensorflow as tf
 
 from src.Data.DataGenerator import ResizedDataGenerator
 
 
-def load_data(data_name: str, amount=None) -> tf.data.Dataset:
+def load_params(*args):
+    """ 
+    Given multiple arguments this function extracts the 
+    keys and the values and combines them into a dictionary
+    """
+
+    pass
+
+
+def load_data(data_name: str, in_shape: tuple, out_shape: tuple, amount=None) -> tf.data.Dataset:
     """Function to load the given dataset and apply preprocessing steps.
 
     :param data_name: string mapping of the dataset
@@ -22,7 +32,7 @@ def load_data(data_name: str, amount=None) -> tf.data.Dataset:
     if not dataset_gen:
         raise NotImplementedError('No valid dataset is given')
 
-    dataset = tf.data.Dataset.from_generator(
+    raw_dataset = tf.data.Dataset.from_generator(
         dataset_gen(),
         output_types=(tf.float32, tf.int32),
         output_shapes=(
@@ -30,6 +40,8 @@ def load_data(data_name: str, amount=None) -> tf.data.Dataset:
             tf.TensorShape([128, 128, 1])
         )
     )
+
+    data = preprocess_data(raw_dataset)
 
     return dataset
 
@@ -51,4 +63,3 @@ def small_data(amount) -> tuple:
     """
 
     im_generator = ResizedDataGenerator()
-    
