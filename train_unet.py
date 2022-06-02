@@ -8,30 +8,53 @@ import os
 from IPython.display import clear_output
 
 
+<<<<<<< HEAD
+from dataset_generator import DatasetGenerator, Generator_resized_data
+#from models.test_net import build_model, finalize_model
+from src.Callbacks import DisplayTestCallback
+from src.Losses import HybridLoss
+from src.models.unet import UNetCompiled
+=======
 from dataset_generator import DatasetGenerator, ResizedDataGenerator
 #from models.test_net import build_model, finalize_model
 from models.unet_tensorflow import model
+>>>>>>> 5f75df3bb841ce079f21ab92638974590d718f1e
 
+model = UNetCompiled()
+model.compile(loss=tf.keras.losses.MeanSquaredError())
 
 img_types = ['PAN', 'PS-RGB', 'PS-RGBNIR', 'RGBNIR', 'SAR-Intensity']
 # Hyperparameters
 IMG_TYPE = img_types[1]
 BATCH_SIZE = 16
 PREFETCH_SIZE = 24
-EPOCHS = 2
+EPOCHS = 10
 MODEL_NAME = 'standart model'
 
 
+<<<<<<< HEAD
+def create_resized_dataset(image_ids = None):
+=======
 def create_resized_dataset(image_ids=None):
+>>>>>>> 5f75df3bb841ce079f21ab92638974590d718f1e
     """Creates tf.dataset of resized images without black bars
 
     image_ids : iterator of string of image_ids you want to train on
     """
+<<<<<<< HEAD
+    dataset = tf.data.Dataset.from_generator(
+        Generator_resized_data(image_ids = image_ids),
+        output_types=(tf.float32, tf.int8),
+        output_shapes= (tf.TensorShape([128, 128, 4]), tf.TensorShape([128, 128, 1]))
+    )
+    return dataset
+=======
     return tf.data.Dataset.from_generator(ResizedDataGenerator(image_ids=image_ids),
                                           output_types=(tf.float32, tf.int32),
                                           output_shapes=(tf.TensorShape(
                                               [128, 128, 4]), tf.TensorShape([128, 128, 1]))
                                           )
+>>>>>>> 5f75df3bb841ce079f21ab92638974590d718f1e
 
 
 def create_dataset(image_type: str = IMG_TYPE, max_images=None) -> tf.data.Dataset:
@@ -130,7 +153,7 @@ def train(model, train_dataset: tf.data.Dataset,
     """
     # fit model to data
     model.fit(train_dataset, validation_data=val_dataset,
-              epochs=epochs, callbacks=[DisplayCallback()])
+              epochs=epochs, callbacks=[DisplayTestCallback(dataset.take(8))])
     if save_model:
         model.save(f'model/{model.name}')
 
@@ -162,13 +185,15 @@ def display(display_list):
         plt.imshow(tf.keras.utils.array_to_img(display_list[i]))
         plt.axis('off')
     plt.show()
+    input()
+    plt.close()
 
 
 def show_predictions(num=1):
     if dataset:
         for image, mask in dataset.take(num):
             pred_mask = model.predict(image)
-            display([image[0], mask[0], pred_mask[0]])
+            display([mask[0], pred_mask[0]])#[image[0], mask[0], pred_mask[0]])
 
 
 if __name__ == '__main__':
@@ -179,8 +204,8 @@ if __name__ == '__main__':
     tf.keras.backend.clear_session()
 
     print(os.getcwd())
-
-    dataset = create_resized_dataset()
+    ids = image_ids = np.array([i[:-4] for i in os.listdir("../datasets/train/AOI_11_Rotterdam/Labels_128")])
+    dataset = create_resized_dataset(ids[:])
     dataset = dataset_pipeline(dataset)
 
     show_predictions()
