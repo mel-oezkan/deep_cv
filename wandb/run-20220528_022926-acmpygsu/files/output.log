@@ -1,0 +1,36 @@
+
+Setting up data pipeline
+[34m[1mwandb[39m[22m: [33mWARNING[39m The save_model argument by default saves the model in the HDF5 format that cannot save custom objects like subclassed models and custom layers. This behavior will be deprecated in a future release in favor of the SavedModel format. Meanwhile, the HDF5 model is saved as W&B files and the SavedModel as W&B Artifacts.
+[34m[1mwandb[39m[22m: [33mWARNING[39m The data_type argument of wandb.keras.WandbCallback is deprecated and will be removed in a future release. Please use input_type instead.
+[34m[1mwandb[39m[22m: [33mWARNING[39m Setting input_type = data_type.
+Restric
+Virtual devices cannot be modified after being initialized
+Epoch 1/2
+2022-05-28 02:30:31.067506: I tensorflow/stream_executor/cuda/cuda_dnn.cc:366] Loaded cuDNN version 8400
+
+
+
+
+
+
+
+
+
+
+
+13/13 [==============================] - 74s 4s/step - loss: -0.2050 - accuracy: 0.7966 - _timestamp: 1653697893.0000 - _runtime: 126.0000
+Epoch 2/2
+ 1/13 [=>............................] - ETA: 6s - loss: 0.3735 - accuracy: 0.5788
+
+
+
+
+
+
+
+
+
+
+
+13/13 [==============================] - 28s 2s/step - loss: 0.2728 - accuracy: 0.3823 - _timestamp: 1653697922.0000 - _runtime: 155.0000
+[34m[1mwandb[39m[22m: [33mWARNING[39m No validation_data set, pass a generator to the callback.
