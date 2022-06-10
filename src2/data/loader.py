@@ -1,5 +1,7 @@
 import tensorflow as tf
 
+from src2.data.DataGenerator import ResizedDataGenerator
+
 
 def create_split():
     """Creates a tilemap of the data from which non-overlapping
@@ -17,14 +19,14 @@ def create_split():
     pass
 
 
-def create_dataset(data_name: str, in_shape: tuple, out_shape: tuple) -> None:
+def create_dataset(data_name: str, in_shape: tuple, out_shape: tuple) -> tf.data.Dataset:
     """Given a name of a dataset returns the respecitve 
     dataset which will then be preprocessed
     """
 
     dataset_gen = None
     if data_name == "reduced_data":
-        pass
+        dataset_gen = ResizedDataGenerator()
 
     if not dataset_gen:
         raise NotImplementedError('No valid dataset is given')
@@ -38,4 +40,4 @@ def create_dataset(data_name: str, in_shape: tuple, out_shape: tuple) -> None:
         )
     )
 
-    return raw_dataset
+    return raw_dataset, len(dataset_gen)

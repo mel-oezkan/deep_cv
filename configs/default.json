@@ -1,0 +1,12 @@
+{
+    "data": {
+        "data_name": "reduced_size",
+        "in_shape": [128, 128, 4],
+        "out_shape": [128, 128, 1],
+        "bach-size": 64
+    }, 
+
+    "training": {
+        "epochs": 12,
+    }
+}

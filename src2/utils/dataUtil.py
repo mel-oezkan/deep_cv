@@ -1,7 +1,7 @@
 import tensorflow as tf
 from src2.data.loader import create_dataset
 
-# Todo: is this function usefull
+#! Function is redundant
 
 
 def convert_params(params: dict) -> dict:
@@ -30,6 +30,16 @@ def load_data(data_args: dict) -> tf.data.Dataset:
     # initalize the split
 
     # initalize the generator and create the dataset
-    dataset = create_dataset()
+    raw_dataset, im_count = create_dataset(
+        data_args["dataset_name"],
+        data_args["in_shape"],
+        data_args["out_shape"],
+    )
 
-    return
+    processed_dataset = processed_dataset(
+        raw_dataset,
+        data_args["batch_size"],
+        im_count
+    )
+
+    return processed_dataset

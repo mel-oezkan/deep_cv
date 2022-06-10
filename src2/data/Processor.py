@@ -1,7 +1,11 @@
 import tensorflow as tf
 
 
-def preprocess_data(dataset, batch_size, n_counts):
+def normalize(max, min):
+    pass
+
+
+def preprocess_data(dataset: tf.data.Dataset, n_counts: int, batch_size: int):
 
     # shuffle, batch and prefetch the dataset
     dataset = dataset.shuffle(tf.data.Autotune)

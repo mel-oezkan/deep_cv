@@ -3,6 +3,7 @@ import wandb
 from wandb.keras import WandbCallback
 
 import tensorflow as tf
+import numpy as np
 from create_labels import *
 
 from dataset_generator import DatasetGenerator
@@ -24,26 +25,7 @@ tf.keras.backend.clear_session()
 
 
 # -------------- Setting up Data Pipeline --------------
-print('Setting up data pipeline')
-AOI_PATH = '/home/melih/Code/uni/sem6/space_net/train/AOI_11_Rotterdam'
-image_type = 'PS-RGB'
 
-
-img_path_prototype = f'{AOI_PATH}/{image_type}/SN6_Train_AOI_11_Rotterdam_{image_type}_'
-summary = load_summary(
-    f'{AOI_PATH}/SummaryData/SN6_Train_AOI_11_Rotterdam_Buildings.csv')
-
-
-img_ids = list(set(summary['ImageId']))
-data_gen = DatasetGenerator(
-    img_ids, summary, img_path_prototype, shuffle=True, limit=200)
-
-out_type = (tf.float32, tf.int64)
-out_shape = (tf.TensorShape([256, 256, 3]), tf.TensorShape([256, 256, 1]))
-
-dataset = tf.data.Dataset.from_generator(
-    data_gen, out_type, out_shape
-).batch(wandb.config.get('batch_size'))
 
 # -------------- Creating Test Samples --------------
 
