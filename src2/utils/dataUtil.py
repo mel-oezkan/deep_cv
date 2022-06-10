@@ -30,12 +30,14 @@ def load_data(data_args: dict) -> tf.data.Dataset:
     # initalize the split
 
     # initalize the generator and create the dataset
+    print('Creating raw dataset')
     raw_dataset, im_count = create_dataset(
         data_args["dataset_name"],
         data_args["in_shape"],
         data_args["out_shape"],
     )
 
+    # print processing raw dataset
     processed_dataset = processed_dataset(
         raw_dataset,
         data_args["batch_size"],
