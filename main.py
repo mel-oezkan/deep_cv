@@ -11,8 +11,6 @@ import argparse
 from src2.utils.config_util import load_config
 from src2.training.train_model import create_model, train_model
 
-from src2.utils.dataUtil import load_data
-
 
 tf.keras.backend.clear_session()
 
@@ -48,17 +46,13 @@ if args.log:
 
 dataset = load_data(config["data"])
 
-# -------------- Creating Test Samples --------------
-
-# what should happen here? test samples should be created before
 
 # -------------- Setting up Training --------------
 
-model = create_model (config["training"])
+model = create_model(config["training"])
 
 # -------------- Train Model --------------
 
 train_model(config["training"])
 
 # -------------- Evaluate Model --------------
-

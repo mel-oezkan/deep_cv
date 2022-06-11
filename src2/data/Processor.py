@@ -2,9 +2,9 @@ import tensorflow as tf
 
 
 def normalize(image, max: float, min: float):
+    norm_im = (image - min) / (max - min)
 
-    norm_im = image
-    pass
+    return norm_im
 
 
 def preprocess_data(dataset: tf.data.Dataset, n_counts: int, batch_size: int):
