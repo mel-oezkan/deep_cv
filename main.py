@@ -1,9 +1,9 @@
-"""from distutils.command.config import config
+from distutils.command.config import config
 import json
 import random
 from xmlrpc.client import boolean
 import wandb
-from wandb.keras import WandbCallback"""
+from wandb.keras import WandbCallback
 
 import tensorflow as tf
 import numpy as np
@@ -54,7 +54,7 @@ dataset = load_data(config["data"])
 
 # -------------- Setting up Training --------------
 
-model = create_model (config["model"])
+model = create_model (config["training"])
 
 # -------------- Train Model --------------
 

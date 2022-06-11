@@ -2,7 +2,7 @@ import tensorflow as tf
 import datetime
 
 
-def create_model(model_args):
+def create_model(train_args):
     """Create a tensorflow model.
 
     :param model_args: contains all arguments necessary to create the model
@@ -12,8 +12,8 @@ def create_model(model_args):
     """
     # check that all relevant keys are present
     for arg in ['model_type', 'optimizer', 'loss']:
-        assert arg in model_args.keys(), f"[{arg}] is missing in model_args!"
-    model_type = model_args['model_type']
+        assert arg in train_args.keys(), f"[{arg}] is missing in model_args!"
+    model_type = train_args['model_type']
 
     # import correct model
     if model_type == 'unet':
@@ -22,7 +22,7 @@ def create_model(model_args):
         print(f"Model of type [{model_type}] not found.")
 
     # compile model
-    model.compile(optimizer=model_args['optimizer'], loss=model_args['loss'])
+    model.compile(optimizer=train_args['optimizer'], loss=model_args['loss'])
     return model
 
 
