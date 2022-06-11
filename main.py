@@ -8,7 +8,7 @@ from wandb.keras import WandbCallback
 import tensorflow as tf
 import numpy as np
 import argparse
-from src2.utils.configUtil import load_config
+from src2.utils.config_util import load_config
 from src2.training.train_model import create_model, train_model
 
 from src2.utils.dataUtil import load_data
