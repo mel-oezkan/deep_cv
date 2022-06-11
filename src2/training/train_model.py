@@ -26,18 +26,15 @@ def create_model(model_args):
     return model
 
 
-def train(model, train_dataset, val_dataset, train_args):
+def train_model(model, train_dataset, val_dataset, train_args):
     """Trains a given model.
 
     :param model: model to be trained
     :type model: tf.Model
-
     :param train_dataset: dataset model should be trained on
     :type train_dataset: tf.data.Dataset
-
     :param val_dataset: dataset model should be valided on, defaults to None
     :type val_dataset: tf.data.Dataset
-
     :return: 
     :rtype: 
     """

@@ -1,14 +1,15 @@
-from distutils.command.config import config
+"""from distutils.command.config import config
 import json
 import random
 from xmlrpc.client import boolean
 import wandb
-from wandb.keras import WandbCallback
+from wandb.keras import WandbCallback"""
 
 import tensorflow as tf
 import numpy as np
 import argparse
 from src2.utils.configUtil import load_config
+from src2.training.train_model import create_model, train_model
 
 from src2.utils.dataUtil import load_data
 
@@ -16,6 +17,9 @@ from src2.utils.dataUtil import load_data
 tf.keras.backend.clear_session()
 
 # -------------- Create and parse argumente parser --------------
+
+# can all this be moved away?
+
 parser = argparse.ArgumentParser(
     description="Student-t Variational Autoencoder for Robust Density Estimation.")
 
@@ -46,36 +50,15 @@ dataset = load_data(config["data"])
 
 # -------------- Creating Test Samples --------------
 
+# what should happen here? test samples should be created before
+
 # -------------- Setting up Training --------------
 
-
-# print('Restric')
-# gpus = tf.config.experimental.list_physical_devices('GPU')
-# if gpus:
-#     try:
-#         tf.config.experimental.set_virtual_device_configuration(
-#             gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=5144)])
-#     except RuntimeError as e:
-#         print(e)
-
-# model = BasicUnet.create_model()
-# model.compile(
-#     loss=tf.keras.losses.MeanSquareError()
-# )
+model = create_model (config["model"])
 
 # -------------- Train Model --------------
 
-# model_history = model.fit(
-#     dataset,
-#     epochs=wandb.config.get('epochs'),
-#     callbacks=[
-#         DisplayTestCallback(dataset.take(1)),
-#         WandbCallback(
-#             data_type='image',
-#             input_type='image',
-#             output_type='segmentation_mask',
-#             predictions=10,
-#             training_data=[val_imgs, val_label]
-#         )
-#     ]
-# )
+train_model(config["training"])
+
+# -------------- Evaluate Model --------------
+
