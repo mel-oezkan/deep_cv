@@ -20,7 +20,7 @@ def create_split():
 
 
 def create_dataset(data_name: str, in_shape: tuple, out_shape: tuple) -> tf.data.Dataset:
-    """Given a name of a dataset returns the respecitve 
+    """ Given a name of a dataset returns the respecitve 
     dataset which will then be preprocessed
     """
 

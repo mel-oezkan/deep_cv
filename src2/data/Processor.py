@@ -1,7 +1,9 @@
 import tensorflow as tf
 
 
-def normalize(max, min):
+def normalize(image, max: float, min: float):
+
+    norm_im = image
     pass
 
 

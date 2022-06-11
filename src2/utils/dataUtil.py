@@ -1,5 +1,6 @@
 import tensorflow as tf
 from src2.data.loader import create_dataset
+from src2.data.Processor import preprocess_data
 
 #! Function is redundant
 
@@ -38,10 +39,12 @@ def load_data(data_args: dict) -> tf.data.Dataset:
     )
 
     # print processing raw dataset
-    processed_dataset = processed_dataset(
+    train_data = processed_dataset(
         raw_dataset,
         data_args["batch_size"],
         im_count
     )
 
-    return processed_dataset
+    test_split = im_count
+
+    return train_data
