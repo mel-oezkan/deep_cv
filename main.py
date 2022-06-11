@@ -8,7 +8,9 @@ from wandb.keras import WandbCallback
 import tensorflow as tf
 import numpy as np
 import argparse
+
 from src2.utils.config_util import load_config
+from src2.data.dataset import load_data
 from src2.training.train_model import create_model, train_model
 
 
@@ -43,12 +45,10 @@ if args.log:
     }
 
 # -------------- Setting up Data Pipeline --------------
-
 dataset = load_data(config["data"])
 
 
 # -------------- Setting up Training --------------
-
 model = create_model(config["training"])
 
 # -------------- Train Model --------------
