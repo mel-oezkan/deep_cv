@@ -4,6 +4,8 @@ from posixpath import split
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import itertools
+import copy
 
 # geospatial frameworks
 import rasterio as rs
@@ -77,9 +79,6 @@ def filter_tile(aoi_df, gdf):
 def split_tiles(geojson_name='tile_positions.geojson', splits=10):
     if not exists(f'{ROOT_DIR}/SummaryData/{geojson_name}'):
         # grab unique image_id from the annotation csv
-        print(exists(f'{ROOT_DIR}/SummaryData/{geojson_name}'))
-        input()
-
         df = pd.read_csv(ROOT_DIR + '/SummaryData/SN6_Train_AOI_11_Rotterdam_Buildings.csv')
         image_ids = df.ImageId.unique()
         create_geometry(f'{ROOT_DIR}/SummaryData/{geojson_name}', image_ids)
@@ -94,27 +93,44 @@ def split_tiles(geojson_name='tile_positions.geojson', splits=10):
     return filtered_tiles
 
 
-def recombine_even_splits(even_splits, out_splits={'train':0.7, 'valid':0.15, 'test':0.15}):
+def recombine_splits(even_splits, out_splits):
+    global min_conf, d_min
+    min_conf = {}
+    d_min = 1000000
     split_sizes = [len(split) for split in even_splits]
-    total_amount = sum(split_sizes)
-    li = 0
-    target_splits = {key:[] for key in out_splits.keys()}
-    for key, split_proportion in out_splits.items():
-        for i in range(li, len(split_sizes)):
-            next_total_amount = sum(target_splits[key]) + split_sizes[i]
-            if abs(next_total_amount - total_amount * 0.7) < abs(sum(target_splits[key]) - total_amount * 0.7):
-                target_splits[key].append(split_sizes[i])
-                li = i+1
-            else:
-                break
-    return target_splits
+    total_sum = sum(split_sizes)
+
+    def recursive_loop(split_dict, arr, idx=0, pos_key=0, splits={}):
+        global d_min, min_conf
+        if pos_key == len(split_dict.keys()) - 1:
+            splits[list(split_dict.keys())[pos_key]] = arr[idx+1:]
+            d = 0
+            for key in out_splits.keys():
+                d += abs(total_sum * out_splits[key] - sum(splits[key]))
+            if d < d_min: 
+                min_conf = copy.deepcopy(splits)
+                d_min = d
+        else:
+            for i in range(idx+1, len(arr) - (len(split_dict.keys()) - pos_key - 1)):
+                arr_subset = arr[idx: i]
+                splits[list(split_dict.keys())[pos_key]] = arr_subset
+                recursive_loop(split_dict, arr, i, pos_key+1, splits)
+    
+    for l, perm in enumerate(itertools.permutations(split_sizes, len(split_sizes))):
+        recursive_loop(out_splits, perm)
+    
+    result = {}
+    for key in min_conf.keys():
+        result[key] = []
+        for length in min_conf[key]:
+            result[key].append(even_splits[split_sizes.index(length)])
+        result[key] = np.concatenate(result[key], axis=0)
+    
+    return result
 
 
-a = split_tiles()
-split_sizes = [len(split) for split in a]
-print(split_sizes)
-total_amount = sum(split_sizes)
-out_splits={'train':0.7, 'valid':0.15, 'test':0.15}
-b = recombine_even_splits(a, out_splits)
-for key in out_splits.keys():
-    print(sum(b[key]), total_amount*out_splits[key])
+def create_splits(out_splits={'train':0.7, 'valid':0.15, 'test':0.15},
+                  geojson_name='tile_positions.geojson', splits=10):
+    splits = split_tiles(geojson_name, splits)
+    proportion_splits = recombine_splits(splits, out_splits)
+    return proportion_splits
