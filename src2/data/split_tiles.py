@@ -25,7 +25,6 @@ def get_raster(image_id, mode='PS-RGB'):
 
 def create_geometry(filepath, image_ids):
     geometry = []
-
     for image_id in image_ids:
         # read the raster
         ex_raster = rs.open(get_filepath(image_id, 'PS-RGB'))
@@ -39,7 +38,7 @@ def create_geometry(filepath, image_ids):
 
     # saving to geojson file
     gdf.to_file(filepath, driver='GeoJSON')
-    print(f'{mode}.geojson saved successfully!')
+    print(f'{filepath} saved successfully!')
 
 # get total bounds of gdf
 def generate_AOI(split, gdf):
@@ -51,10 +50,10 @@ def generate_AOI(split, gdf):
         u_bbox = bbox+(unit*i)  # i starts at 0, so u_bbox=bbox, then adds unit for each iter
         u_tbox = u_bbox+unit
         stripe = Polygon([
-            (lbox,u_tbox),
-            (rbox,u_tbox),
-            (rbox,u_bbox),
-            (lbox,u_bbox)])
+            (lbox, u_tbox),
+            (rbox, u_tbox),
+            (rbox, u_bbox),
+            (lbox, u_bbox)])
         geometry.append(stripe)
         
     # create geodataframe
@@ -96,7 +95,7 @@ def split_tiles(geojson_name='tile_positions.geojson', splits=10):
 def recombine_splits(even_splits, out_splits):
     global min_conf, d_min
     min_conf = {}
-    d_min = 1000000
+    d_min = np.inf
     split_sizes = [len(split) for split in even_splits]
     total_sum = sum(split_sizes)
 
