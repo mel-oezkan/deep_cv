@@ -126,10 +126,3 @@ def recombine_splits(even_splits, out_splits):
         result[key] = np.concatenate(result[key], axis=0)
     
     return result
-
-
-def create_splits(out_splits={'train':0.7, 'valid':0.15, 'test':0.15},
-                  geojson_name='tile_positions.geojson', splits=10):
-    splits = split_tiles(geojson_name, splits)
-    proportion_splits = recombine_splits(splits, out_splits)
-    return proportion_splits

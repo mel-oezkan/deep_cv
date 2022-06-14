@@ -1,22 +1,32 @@
 import tensorflow as tf
 
 from src2.data.DataGenerator import ResizedDataGenerator
-from src2.data.
+from src2.data.split_tiles import split_tiles, recombine_splits
+from src2.data.preprocessing import preprocess_data
 
-def create_split():
-    """Creates a tilemap of the data from which non-overlapping
-    samples will be generated for the test dataset. The unused data
-    will then be used for the trainng set.
 
-    :returns: List of ids which are going to be used fro the generator
-    :rtype: list
+def create_split(split_proportions={'train':0.7, 'valid':0.15, 'test':0.15},
+                 strip_number=10, geojson_name='tile_positions.geojson'):
+    """Create dataset splits. These are minimally overlapping and roughly have
+    the proportion provided with split_proportions.
+
+    :param split_proportions: names of different datasets and the proportion
+        of their elements, defaults to {'train':0.7, 'valid':0.15, 'test':0.15}
+    :type split_proportions: dictonary of floats, optional
+    :param strip_number: number of strips to cut map of tiles into, the more
+        strips closer the number of ids in the returned splits to their target
+        number. This is because these n minimally overlapping strips are
+        recombined to create the final splits, defaults to 10
+    :type strip_number: integer, optional
+    :param geojson_name: name of geojson file that is created in the process,
+        defaults to tile_positions.geojson
+    :type geojson_name: string with ending .geojson, optional
+    :returns: dictonary with an array of ids for each split
+    :rtype: dictonary with np.ndarray's as values
     """
-
-    # Todo: read the geojson data and create the tilemaps
-
-    # Todo: filter the unique values from the tilemaps and remove the indices
-
-    pass
+    cuts = split_tiles(geojson_name, strip_number)
+    splits = recombine_splits(cuts, split_proportions)
+    return splits
 
 
 def create_dataset(data_name: str, in_shape: tuple, out_shape: tuple) -> tf.data.Dataset:
@@ -48,8 +58,7 @@ def load_data(data_args: dict) -> tf.data.Dataset:
 
     :params data_args: contains all the variabels for the data pipline
     :type: dict
-
-    :returns: Returns the preprocessed dataset
+    :return: Returns the preprocessed dataset
     :rtype: tf.data.Dataset
     """
 
@@ -64,7 +73,7 @@ def load_data(data_args: dict) -> tf.data.Dataset:
     )
 
     # print processing raw dataset
-    training_data = processed_dataset(
+    training_data = preprocess_data(
         raw_dataset,
         data_args["batch_size"],
         im_count
