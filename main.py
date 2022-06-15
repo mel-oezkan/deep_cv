@@ -28,7 +28,7 @@ parser.add_argument(
     help="Path to the config file.")
 
 parser.add_argument(
-    "--log", type=boolean, default=True,
+    "--log", type=boolean, default=False,
     help="Path to the config file.")
 
 
@@ -45,14 +45,16 @@ if args.log:
     }
 
 # -------------- Setting up Data Pipeline --------------
+print("Setting up Data pipeline")
 dataset = load_data(config["data"])
 
 
 # -------------- Setting up Training --------------
+print("Creating the model")
 model = create_model(config["training"])
 
 # -------------- Train Model --------------
-
+print("Train the new Model")
 train_model(config["training"])
 
 # -------------- Evaluate Model --------------

@@ -8,8 +8,10 @@ from src2.data.split_tiles import split_tiles, recombine_splits
 from src2.data.preprocessing import preprocess_data
 
 
-def create_splits(split_proportions={'train': 0.7, 'valid': 0.15, 'test': 0.15},
-                  strip_number=10, geojson_name='tile_positions.geojson'):
+def create_splits(
+        split_proportions={'train': 0.7, 'valid': 0.15, 'test': 0.15},
+        strip_number=10,
+        geojson_name='tile_positions.geojson'):
     """Create dataset splits. These are minimally overlapping and roughly have
     the proportion provided with split_proportions.
 
@@ -24,22 +26,33 @@ def create_splits(split_proportions={'train': 0.7, 'valid': 0.15, 'test': 0.15},
     :param geojson_name: name of geojson file that is created in the process,
         defaults to tile_positions.geojson
     :type geojson_name: string with ending .geojson, optional
+
     :return: dictonary with an array of ids for each split
     :rtype: dictonary with np.ndarray's as values
     """
     cuts = split_tiles(geojson_name, strip_number)
     splits = recombine_splits(cuts, split_proportions)
+
     return splits
 
 
-def create_dataset(tile_ids: np.ndarray, data_name: str,
-                   in_shape: tuple, out_shape: tuple) -> tf.data.Dataset:
+def create_dataset(
+        tile_ids: np.ndarray,
+        data_name: str,
+        in_shape: tuple,
+        out_shape: tuple) -> tf.data.Dataset:
     """ Given a name of a dataset returns the respecitve 
     dataset which will then be preprocessed.
 
-    ...
+    :param tile_ids: np.ndarray, 
+    :param data_name: str,
+    :param in_shape: tuple, 
+    :param out_shape: tuple
+
+    :returns tf.data.Dataset
     """
 
+    # Load the generator of thre respective dataset
     dataset_gen = None
     if data_name == "reduced_data":
         dataset_gen = ResizedDataGenerator(image_ids=tile_ids)
@@ -47,6 +60,7 @@ def create_dataset(tile_ids: np.ndarray, data_name: str,
     if not dataset_gen:
         raise NotImplementedError('No valid dataset is given')
 
+    # Convert generator to tf.Data
     raw_dataset = tf.data.Dataset.from_generator(
         dataset_gen(),
         output_types=(tf.float32, tf.int32),
@@ -60,7 +74,7 @@ def create_dataset(tile_ids: np.ndarray, data_name: str,
 
 
 def load_data(data_args: dict, **kwargs) -> tf.data.Dataset:
-    """Fetch all parameters and load the respective dataset
+    """Fetch all parameters and load the splitted datasets
 
     :params data_args: contains all the variabels for the data pipline
     :type: dict
@@ -74,6 +88,7 @@ def load_data(data_args: dict, **kwargs) -> tf.data.Dataset:
     # create dataset and preprocess each split
     datasets = {}
     for key, tile_ids in tile_splits.items():
+
         # initalize the generator and create the dataset
         raw_dataset, im_count = create_dataset(
             tile_ids,
@@ -88,6 +103,7 @@ def load_data(data_args: dict, **kwargs) -> tf.data.Dataset:
             data_args["batch_size"],
             im_count
         )
+
         datasets[key] = training_data
 
     return datasets
