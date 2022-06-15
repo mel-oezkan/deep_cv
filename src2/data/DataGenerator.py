@@ -6,15 +6,19 @@ import cv2
 import skimage
 import pandas as pd
 
+from src2.data import ROOT_DIR
+
 
 class ResizedDataGenerator():
 
-    """Generator to load resized images witout black bars
+    """Generator to load resized images witout black bars.
+
+    :param image_ids : iterator of string of image_ids you want to train on
     """
 
     def __init__(self, image_ids=None):
-        """
-        image_ids : iterator of string of image_ids you want to train on"""
+        """ Constructor function"""
+       
         self.image_ids = image_ids
 
         if self.image_ids is None:
@@ -23,12 +27,12 @@ class ResizedDataGenerator():
 
     def load_sample(self, index):
         img_id = self.image_ids[index]
-        sar_path = f"../datasets/train/AOI_11_Rotterdam/SAR-Intensity_128/SN6_Train_AOI_11_Rotterdam_SAR-Intensity_{img_id}.tif"
-        label_path = f"../datasets/train/AOI_11_Rotterdam/Labels_128/{img_id}.tif"
+        sar_path = f"{ROOT_DIR}/SAR-Intensity_128/SN6_Train_AOI_11_Rotterdam_SAR-Intensity_{img_id}.tif"
+        label_path = f"{ROOT_DIR}/datasets/train/AOI_11_Rotterdam/Labels_128/{img_id}.tif"
 
         # create paths
-        sar_path = f"../datasets/train/AOI_11_Rotterdam/SAR-Intensity_128/SN6_Train_AOI_11_Rotterdam_SAR-Intensity_{img_id}.tif"
-        label_path = f"../datasets/train/AOI_11_Rotterdam/Labels_128/{img_id}.tif"
+        sar_path = f"{ROOT_DIR}/SAR-Intensity_128/SN6_Train_AOI_11_Rotterdam_SAR-Intensity_{img_id}.tif"
+        label_path = f"{ROOT_DIR}/Labels_128/{img_id}.tif"
 
         # load and convert sar image
         sar_img = tf.image.convert_image_dtype(cv2.imread(
