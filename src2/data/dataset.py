@@ -30,7 +30,10 @@ def create_splits(
     :return: dictonary with an array of ids for each split
     :rtype: dictonary with np.ndarray's as values
     """
+    print('\t\t Splitting Tiles')
     cuts = split_tiles(geojson_name, strip_number)
+
+    print('\t\t Combining Tiles to split')
     splits = recombine_splits(cuts, split_proportions)
 
     return splits
@@ -83,8 +86,10 @@ def load_data(data_args: dict, **kwargs) -> tf.data.Dataset:
     """
 
     # initalize the split
+    print('\t Creating Split')
     tile_splits = create_splits(**kwargs)
 
+    print('\t Initalize Datasets')
     # create dataset and preprocess each split
     datasets = {}
     for key, tile_ids in tile_splits.items():

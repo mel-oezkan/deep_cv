@@ -14,7 +14,7 @@ import rasterio as rs
 from rasterio.plot import show  # imshow for raster
 import geopandas as gpd
 from shapely.geometry import Polygon, box  # for geometry processing
-from src2.data import ROOT_DIR
+from src2.data import ROOT_DIR, TEST_ROOT_DIR
 
 
 def get_filepath(image_id, mode='PS-RGB'):
@@ -87,12 +87,14 @@ def filter_tile(aoi_df, gdf):
 
 def split_tiles(geojson_name='tile_positions.geojson', splits=10):
 
+    print('\t\t\t Creating new global geojson csv')
     if not exists(f'{ROOT_DIR}/SummaryData/{geojson_name}'):
         # grab unique image_id from the annotation csv
-        building_csv_path = pathlib.Path(
-            ROOT_DIR + '/SummaryData/SN6_Train_AOI_11_Rotterdam_Buildings.csv')
+        building_csv_path = TEST_ROOT_DIR.joinpath(
+            'SummaryData', 'SN6_Train_AOI_11_Rotterdam_Buildings.csv')
+
         df = pd.read_csv(
-            str(building_csv_path.absolute()))
+            str(building_csv_path))
 
         image_ids = df.ImageId.unique()
         create_geometry(f'{ROOT_DIR}/SummaryData/{geojson_name}', image_ids)
@@ -110,15 +112,34 @@ def split_tiles(geojson_name='tile_positions.geojson', splits=10):
     return filtered_tiles
 
 
-def recombine_splits(even_splits, out_splits):
+def recombine_splits(even_splits, out_splits) -> dict:
+    """
+
+    :param even_splits:
+    :param out_split:
+
+
+    :returns result: where keys contains the split type and 
+        values are the indices used for that split
+    :rtype: dict
+    """
+
     global min_conf, d_min
     min_conf = {}
+
     d_min = np.inf
     split_sizes = [len(split) for split in even_splits]
     total_sum = sum(split_sizes)
 
-    def recursive_loop(split_dict, arr, idx=0, pos_key=0, splits={}):
+    def recursive_loop(split_dict: dict, arr: list, idx=0, pos_key=0, splits={}) -> None:
+        """
+
+        :param split_dict: 
+        :param arr: combination of different tile groups
+
+        """
         global d_min, min_conf
+
         if pos_key == len(split_dict.keys()) - 1:
             splits[list(split_dict.keys())[pos_key]] = arr[idx+1:]
             d = 0
@@ -133,6 +154,7 @@ def recombine_splits(even_splits, out_splits):
                 splits[list(split_dict.keys())[pos_key]] = arr_subset
                 recursive_loop(split_dict, arr, i, pos_key+1, splits)
 
+    # iterates over all possible permuations
     for l, perm in enumerate(itertools.permutations(split_sizes, len(split_sizes))):
         recursive_loop(out_splits, perm)
 

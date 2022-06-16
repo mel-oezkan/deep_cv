@@ -1,6 +1,6 @@
 {
     "data": {
-        "dataset_name": "reduced_size",
+        "dataset_name": "reduced_data",
         "in_shape": [128, 128, 4],
         "out_shape": [128, 128, 1],
         "bach-size": 64,

@@ -1,7 +1,7 @@
 from distutils.command.config import config
 import json
 import random
-from xmlrpc.client import boolean
+
 import wandb
 from wandb.keras import WandbCallback
 
@@ -28,7 +28,7 @@ parser.add_argument(
     help="Path to the config file.")
 
 parser.add_argument(
-    "--log", type=boolean, default=False,
+    "--log", type=bool, default=False,
     help="Path to the config file.")
 
 

@@ -18,7 +18,7 @@ class ResizedDataGenerator():
 
     def __init__(self, image_ids=None):
         """ Constructor function"""
-       
+
         self.image_ids = image_ids
 
         if self.image_ids is None:
@@ -70,10 +70,17 @@ class ResizedDataGenerator():
 
         return self.load_sample(idx)
 
-    def __call__(self, limit):
-        # for all ids
+    def __call__(self, limit: int = None):
+        """Createse a generator that yields the
+        satelite images
 
-        im_count = min(limit, len(self.image_ids))
+        :param limti: reduces the amount of entries returned
+        """
+
+        im_count = len(self.image_ids)
+        if limit:
+            im_count = min(limit, im_count)
+
         for img_id in range(im_count):
             yield self.load_sample(img_id)
 
