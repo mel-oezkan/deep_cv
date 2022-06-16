@@ -1,20 +1,14 @@
-from distutils.command.config import config
-import json
-import random
-
 import wandb
 from wandb.keras import WandbCallback
 
 import tensorflow as tf
-import numpy as np
 import argparse
 
 from src2.utils.config_util import load_config
 from src2.data.dataset import load_data
 from src2.training.train_model import create_model, train_model
+from src2.utils.environment import init_environment
 
-
-tf.keras.backend.clear_session()
 
 # -------------- Create and parse argumente parser --------------
 
@@ -44,9 +38,15 @@ if args.log:
         'buffer_size': 1000
     }
 
+
+# -------------- Initalize environment --------------
+print("Initalize Environment")
+init_environment(config["env"])
+
+
 # -------------- Setting up Data Pipeline --------------
 print("Setting up Data pipeline")
-dataset = load_data(config["data"])
+datasets = load_data(config["data"])
 
 
 # -------------- Setting up Training --------------
@@ -55,6 +55,11 @@ model = create_model(config["training"])
 
 # -------------- Train Model --------------
 print("Train the new Model")
-train_model(config["training"])
+train_model(
+    model,
+    datasets['test'],
+    datasets['val'],
+    config["training"]
+)
 
 # -------------- Evaluate Model --------------

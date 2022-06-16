@@ -109,11 +109,13 @@ def load_data(data_args: dict, **kwargs) -> tf.data.Dataset:
             data_args["out_shape"],
         )
 
+        print(im_count)
+
         # print processing raw dataset
         training_data = preprocess_data(
             raw_dataset,
-            data_args["batch_size"],
-            im_count
+            im_count,
+            data_args["batch_size"]
         )
 
         datasets[key] = training_data

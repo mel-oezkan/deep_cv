@@ -1,5 +1,6 @@
 import tensorflow as tf
 import datetime
+from typing import List
 
 
 def create_model(train_args):
@@ -17,13 +18,54 @@ def create_model(train_args):
 
     # import correct model
     if model_type == 'unet':
-        from models import unet as model
+        from src2.models.unet import create_model
     else:
         print(f"Model of type [{model_type}] not found.")
 
     # compile model
-    model.compile(optimizer=train_args['optimizer'], loss=model_args['loss'])
+    model = create_model()
+    model.compile(
+        optimizer=train_args['optimizer'],
+        loss=load_loss(train_args['loss']))
+
     return model
+
+
+def load_loss(loss_name: str):
+    # Todo1: Expand the loss function that loss parameters can be specified manually
+    # Todo2: Include weighted loss
+    """ Given a loss function in the config file
+    imports it and initalizes it.
+
+    :param loss_name: name of the loss function to be loaded
+    :return the respective loss function
+    """
+
+    if loss_name == 'hybrid_loss':
+        from src2.training.Losses import HybridLoss as Loss
+    elif loss_name == 'dice_loss':
+        from src2.training.Losses import DiceLoss as Loss
+    elif loss_name == 'focal_loss':
+        from src2.training.Losses import FocalLoss2d as Loss
+    elif loss_name == 'mean_iou':
+        from src2.training.Losses import MeanIOULoss as Loss
+    elif loss_name == 'sparse_categorical_crossentropy':
+        from tensorflow.keras.losses import SparseCategoricalCrossentropy as Loss
+    elif loss_name == 'mean_square_error':
+        from tensorflow.keras.losses import MeanSquaredError as Loss
+    else:
+        raise NotImplementedError(
+            "Given Loss is not contained in the possible losses")
+
+    loss_fnc = Loss()
+    return loss_fnc
+
+
+def load_callbacks(callbacks: List[str]):
+
+    callback_list = []
+    for callback in callbacks:
+        pass
 
 
 def train_model(model, train_dataset, val_dataset, train_args):
@@ -53,5 +95,5 @@ def train_model(model, train_dataset, val_dataset, train_args):
     # save model
     if train_args['save_model']:
         time = datetime.datetime.now().strftime("%m.%d.%Y-%H:%M:%S")
-        model_name = time + "-" + train_args['model_type']
-        model.save(f'/src/runs/{model_name}')
+        run_name = time + "-" + train_args['model_type']
+        model.save(f'/src/runs/{run_name}')
