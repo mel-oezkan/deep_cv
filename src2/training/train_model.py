@@ -101,7 +101,7 @@ def train_model(model, train_dataset, val_dataset, train_args):
     for arg in ['epochs', 'callbacks']:
         assert arg in train_args.keys(), f"[{arg}] is missing in model_args!"
 
-    callbacks = load_callbacks(train_args['callbacks'])
+    callbacks = load_callbacks(train_args['callbacks'], val_dataset)
 
     # fit model to data
     model.fit(
