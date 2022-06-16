@@ -4,14 +4,15 @@ import tensorflow as tf
 import numpy as np
 
 from src2.data.DataGenerator import ResizedDataGenerator
-from src2.data.split_tiles import split_tiles, recombine_splits
+from src2.data.split_tiles import simple_dist, split_tiles, recombine_splits
 from src2.data.preprocessing import preprocess_data
 
 
 def create_splits(
         split_proportions={'train': 0.7, 'valid': 0.15, 'test': 0.15},
         strip_number=10,
-        geojson_name='tile_positions.geojson'):
+        geojson_name='tile_positions.geojson',
+        debug=False):
     """Create dataset splits. These are minimally overlapping and roughly have
     the proportion provided with split_proportions.
 
@@ -34,6 +35,9 @@ def create_splits(
     cuts = split_tiles(geojson_name, strip_number)
 
     print('\t\t Combining Tiles to split')
+    if debug:
+        return simple_dist(cuts)
+
     splits = recombine_splits(cuts, split_proportions)
 
     return splits
@@ -65,7 +69,7 @@ def create_dataset(
 
     # Convert generator to tf.Data
     raw_dataset = tf.data.Dataset.from_generator(
-        dataset_gen(),
+        dataset_gen,
         output_types=(tf.float32, tf.int32),
         output_shapes=(
             tf.TensorShape(in_shape),
@@ -81,13 +85,16 @@ def load_data(data_args: dict, **kwargs) -> tf.data.Dataset:
 
     :params data_args: contains all the variabels for the data pipline
     :type: dict
+
     :return: dictonary of datasets
-    :rtype: dictonary of tf.data.Dataset's
+    :rtype: dictonary of tf.data.Dataset
     """
 
     # initalize the split
     print('\t Creating Split')
-    tile_splits = create_splits(**kwargs)
+    tile_splits = create_splits(
+        **kwargs,
+        debug=data_args['debug'])
 
     print('\t Initalize Datasets')
     # create dataset and preprocess each split

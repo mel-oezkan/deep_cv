@@ -51,6 +51,7 @@ def create_geometry(filepath, image_ids):
 
 def generate_AOI(split, gdf):
     lbox, bbox, rbox, tbox = gdf.total_bounds
+
     # horizontal stripes divides top-bot
     unit = (tbox-bbox)/split
     geometry = []
@@ -85,10 +86,10 @@ def filter_tile(aoi_df, gdf):
     return aoi_overlay_filt.image_id.values
 
 
-def split_tiles(geojson_name='tile_positions.geojson', splits=10):
+def split_tiles(geojson_name='tile_positions.geojson', splits=10) -> list:
 
-    print('\t\t\t Creating new global geojson csv')
     if not exists(f'{ROOT_DIR}/SummaryData/{geojson_name}'):
+        print('\t\t\t Creating new global geojson csv')
         # grab unique image_id from the annotation csv
         building_csv_path = TEST_ROOT_DIR.joinpath(
             'SummaryData', 'SN6_Train_AOI_11_Rotterdam_Buildings.csv')
@@ -105,24 +106,27 @@ def split_tiles(geojson_name='tile_positions.geojson', splits=10):
     filtered_tiles = []
 
     # iterate through all rows
-    for idx, rows in AOI_stripes_gdf.iterrows():
+    for _, rows in AOI_stripes_gdf.iterrows():
         aoi_df = gpd.GeoDataFrame({'geometry': rows}, crs='epsg:32631')
         filtered_tiles.append(filter_tile(aoi_df, gdf))
 
     return filtered_tiles
 
 
-def recombine_splits(even_splits, out_splits) -> dict:
+def recombine_splits(even_splits: list, out_splits: dict) -> dict:
     """
 
-    :param even_splits:
-    :param out_split:
+    :param even_splits: list of tile group inidces
+    :param out_split: distribution of each split
 
 
     :returns result: where keys contains the split type and 
         values are the indices used for that split
     :rtype: dict
     """
+
+    print(len(even_splits))
+    print([len(x) for x in even_splits])
 
     global min_conf, d_min
     min_conf = {}
@@ -166,3 +170,14 @@ def recombine_splits(even_splits, out_splits) -> dict:
         result[key] = np.concatenate(result[key], axis=0)
 
     return result
+
+
+def simple_dist(cuts):
+    print(itertools.chain(*cuts[:8]))
+    tile_dist = {
+        'train': list(itertools.chain(*cuts[:8])),
+        'val': cuts[8],
+        'test': cuts[9]
+    }
+
+    return tile_dist
