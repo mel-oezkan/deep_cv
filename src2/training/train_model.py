@@ -61,11 +61,28 @@ def load_loss(loss_name: str):
     return loss_fnc
 
 
-def load_callbacks(callbacks: List[str]):
+def load_callbacks(callbacks: List[str], val_data):
+
+    labels = {0: 'background', 1: 'footprint'}
 
     callback_list = []
-    for callback in callbacks:
-        pass
+    for callback_name in callbacks:
+        if callback_name == 'wandb':
+            from wandb.keras import WandbCallback
+            new_callback = WandbCallback(
+                data_type='image',
+                validation_data=val_data,
+                labels=labels,
+                output_type='segmentation_mask')
+
+        elif callback_name == 'visualizer':
+            pass
+
+        else:
+            continue
+        callback_list.append(new_callback)
+
+    return callback_list
 
 
 def train_model(model, train_dataset, val_dataset, train_args):
@@ -84,12 +101,14 @@ def train_model(model, train_dataset, val_dataset, train_args):
     for arg in ['epochs', 'callbacks']:
         assert arg in train_args.keys(), f"[{arg}] is missing in model_args!"
 
+    callbacks = load_callbacks(train_args['callbacks'])
+
     # fit model to data
     model.fit(
         train_dataset,
         validation_data=val_dataset,
         epochs=train_args['epochs'],
-        callbacks=train_args['callbacks']
+        callbacks=callbacks
     )
 
     # save model

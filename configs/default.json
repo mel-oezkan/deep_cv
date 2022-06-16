@@ -21,7 +21,7 @@
         "epochs": 12,
         "model_type": "unet",
         "lr-rate": 1e-5,
-        "callbacks": [],
+        "callbacks": ["wandb"],
         "optimizer": "adam",
         "loss": "hybrid_loss"
     }

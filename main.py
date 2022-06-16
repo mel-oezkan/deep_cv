@@ -57,8 +57,8 @@ model = create_model(config["training"])
 print("Train the new Model")
 train_model(
     model,
+    datasets['train'],
     datasets['test'],
-    datasets['val'],
     config["training"]
 )
 
